@@ -1,9 +1,8 @@
-/** @babel */
+const {CompositeDisposable} = require('event-kit')
+const path = require('path')
 
-import {CompositeDisposable} from 'event-kit'
-import path from 'path'
-
-export default class ReopenProjectMenuManager {
+module.exports =
+class ReopenProjectMenuManager {
   constructor ({menu, commands, history, config, open}) {
     this.menuManager = menu
     this.historyManager = history
@@ -58,7 +57,7 @@ export default class ReopenProjectMenuManager {
   // Windows users can right-click Atom taskbar and remove project from the jump list.
   // We have to honor that or the group stops working. As we only get a partial list
   // each time we remove them from history entirely.
-  applyWindowsJumpListRemovals () {
+  async applyWindowsJumpListRemovals () {
     if (process.platform !== 'win32') return
     if (this.app === undefined) {
       this.app = require('remote').app
@@ -68,7 +67,7 @@ export default class ReopenProjectMenuManager {
     if (removed.length === 0) return
     for (let project of this.historyManager.getProjects()) {
       if (removed.includes(ReopenProjectMenuManager.taskDescription(project.paths))) {
-        this.historyManager.removeProject(project.paths)
+        await this.historyManager.removeProject(project.paths)
       }
     }
   }
